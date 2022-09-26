@@ -1,4 +1,4 @@
-#include <gst/gst.h>
+ #include <gst/gst.h>
 #include <glib.h>
 #include <stdio.h>
 #include <math.h>
@@ -12,10 +12,10 @@
 #include "nvds_yml_parser.h"
 #include "gst-nvmessage.h"
 
-#define PGIE_CONFIG_FILE  "dstest2_pgie_config.txt"
+#define PGIE_CONFIG_FILE  "ds_rsu3_pgie_config.txt"
 #define MAX_DISPLAY_LEN 64
 
-#define TRACKER_CONFIG_FILE "dstest2_tracker_config.txt"
+#define TRACKER_CONFIG_FILE "ds_rsu3_tracker_config.txt"
 #define MAX_TRACKING_ID_LEN 16
 
 #define PGIE_CLASS_ID_VEHICLE 0
@@ -529,7 +529,7 @@ main (int argc, char *argv[])
     nvds_parse_streammux(streammux, argv[1],"streammux");
 
     g_object_set (G_OBJECT (pgie),
-      "config-file-path", "dstest3_pgie_config.yml", NULL);
+      "config-file-path", "ds_rsu3_pgie_config.yml", NULL);
 
     g_object_get (G_OBJECT (pgie), "batch-size", &pgie_batch_size, NULL);
     if (pgie_batch_size != num_sources) {
