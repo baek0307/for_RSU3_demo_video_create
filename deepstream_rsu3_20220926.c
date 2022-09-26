@@ -31,12 +31,17 @@
 #define TILED_OUTPUT_WIDTH 1280
 #define TILED_OUTPUT_HEIGHT 720
 
+#define GST_CAPS_FEATURES_NVMM "memory:NVMM"
+
 gint frame_number = 0;
 
 gchar pgie_classes_str[4][32] =
     { "Vehicle", "TwoWheeler", "Person", "RoadSign" };
+
+static gboolean PERF_MODE = FALSE;
+
 static GstPadProbeReturn
-osd_sink_pad_buffer_probe (GstPad * pad, GstPadProbeInfo * info,
+tiler_src_pad_buffer_probe (GstPad * pad, GstPadProbeInfo * info,
     gpointer u_data)
 {
     GstBuffer *buf = (GstBuffer *) info->data;
@@ -100,35 +105,6 @@ osd_sink_pad_buffer_probe (GstPad * pad, GstPadProbeInfo * info,
             frame_number, num_rects, vehicle_count, person_count);
     frame_number++;
     return GST_PAD_PROBE_OK;
-}
-
-static gboolean
-bus_call (GstBus * bus, GstMessage * msg, gpointer data)
-{
-  GMainLoop *loop = (GMainLoop *) data;
-  switch (GST_MESSAGE_TYPE (msg)) {
-    case GST_MESSAGE_EOS:
-      g_print ("End of stream\n");
-      g_main_loop_quit (loop);
-      break;
-    case GST_MESSAGE_ERROR:
-    {
-      gchar *debug;
-      GError *error;
-      gst_message_parse_error (msg, &error, &debug);
-      g_printerr ("ERROR from element %s: %s\n",
-          GST_OBJECT_NAME (msg->src), error->message);
-      if (debug)
-        g_printerr ("Error details: %s\n", debug);
-      g_free (debug);
-      g_error_free (error);
-      g_main_loop_quit (loop);
-      break;
-    }
-    default:
-      break;
-  }
-  return TRUE;
 }
 
 /* Tracker config parsing */
@@ -414,7 +390,7 @@ main (int argc, char *argv[])
   GstElement *transform = NULL;
   GstBus *bus = NULL;
   guint bus_watch_id = 0;
-  GstPad *osd_sink_pad = NULL;
+  GstPad *tiler_src_pad = NULL;
   guint i =0, num_sources = 0;
   guint tiler_rows, tiler_columns;
   guint pgie_batch_size;
