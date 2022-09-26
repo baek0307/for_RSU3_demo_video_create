@@ -293,15 +293,11 @@ main (int argc, char *argv[])
     return -1;
   }
 
-  /* Standard GStreamer initialization */
   gst_init (&argc, &argv);
   loop = g_main_loop_new (NULL, FALSE);
 
-  /* Create gstreamer elements */
-  /* Create Pipeline element that will form a connection of other elements */
   pipeline = gst_pipeline_new ("dstest3-pipeline");
 
-  /* Create nvstreammux instance to form batches from one or more sources. */
   streammux = gst_element_factory_make ("nvstreammux", "stream-muxer");
 
   if (!pipeline || !streammux) {
@@ -485,9 +481,6 @@ main (int argc, char *argv[])
   if(transform) {
     gst_bin_add_many (GST_BIN (pipeline), queue1, pgie, queue2, nvdslogger, tiler,
         queue3, nvvidconv, queue4, nvosd, queue5, transform, sink, NULL);
-    /* we link the elements together
-    * nvstreammux -> nvinfer -> nvdslogger -> nvtiler -> nvvidconv -> nvosd
-    * -> video-renderer */
     if (!gst_element_link_many (streammux, queue1, pgie, queue2, nvdslogger, tiler,
           queue3, nvvidconv, queue4, nvosd, queue5, transform, sink, NULL)) {
       g_printerr ("Elements could not be linked. Exiting.\n");
